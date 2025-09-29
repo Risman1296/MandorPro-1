@@ -65,7 +65,7 @@ export default function DatabaseAdmin() {
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         <Btn label="Pekerja" onPress={() => r.push('/worker/management')} />
         <Btn label="Proyek" onPress={() => r.push('/project/management')} />
-        <Btn label="Material" onPress={() => r.push('/material/usage')} />
+  <Btn label="Material" onPress={() => r.push('/material/management')} />
       </View>
     </View>
   );

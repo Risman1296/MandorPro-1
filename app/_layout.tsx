@@ -22,6 +22,7 @@ export default function RootLayout() {
         <Stack.Screen name="progres/form" />
         <Stack.Screen name="material/usage" />
         <Stack.Screen name="material/stock" />
+  <Stack.Screen name="material/management" />
         <Stack.Screen name="payroll/management" />
         <Stack.Screen name="gaji/weekly" />
         <Stack.Screen name="absensi/index" />
