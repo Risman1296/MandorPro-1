@@ -2,8 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Link, usePathname } from 'expo-router';
 import type { NavNode } from '../src/data/navTree';
+import { Icon } from '../src/ui/Icon';
 
-// Professional icon mapping using Unicode symbols
+// Professional icon mapping using Unicode symbols (fallback)
 const IconMap: { [key: string]: string } = {
   'menu-outline': '≡',
   'grid-outline': '▣',
@@ -27,7 +28,7 @@ const IconMap: { [key: string]: string } = {
   'construct': '⚒',
 };
 
-// Professional icon component with geometric shapes
+// Professional icon component with geometric shapes (fallback)
 const ProfessionalIcon = ({ name, size = 20, color = '#64748b', style }: { name: string; size?: number; color?: string; style?: any }) => {
   const getIconShape = (iconName: string) => {
     const shapes: { [key: string]: React.ReactElement } = {
@@ -309,7 +310,7 @@ const useMenuItems = (navNodes?: NavNode[]): MenuItem[] => {
     const navItems: MenuItem[] = (navNodes ?? []).map((n) => ({
       id: n.id,
       name: n.label,
-      icon: n.id === 'settings' ? 'settings-outline' : 'grid-outline',
+      icon: n.icon || (n.id === 'settings' ? 'settings-outline' : 'grid-outline'),
       route: n.path,
     }));
 
@@ -365,7 +366,8 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
           accessibilityLabel={collapsed ? item.name : undefined}
         >
           <View style={styles.menuButtonContent}>
-            <ProfessionalIcon
+            {/* Prefer Ionicons via Icon helper; fallback stays available below if needed */}
+            <Icon
               name={item.icon}
               size={collapsed ? 22 : 20}
               color={isActive ? '#fff' : '#64748b'}
@@ -376,11 +378,10 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
                   {item.name}
                 </Text>
                 {hasSubItems && (
-                  <ProfessionalIcon
+                  <Icon
                     name={isExpanded ? 'chevron-down' : 'chevron-forward'}
                     size={16}
                     color={isActive ? '#fff' : '#64748b'}
-                    style={styles.chevronIcon}
                   />
                 )}
               </>
@@ -411,7 +412,7 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
                     ]}
                     activeOpacity={0.7}
                   >
-                    <ProfessionalIcon
+                    <Icon
                       name={subItem.icon}
                       size={16}
                       color={isSubActive ? '#3b82f6' : '#94a3b8'}

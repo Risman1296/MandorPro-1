@@ -8,18 +8,16 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "web:clear": "expo start --web --clear",
-
     "web:export": "expo export --platform web -o dist",
     "web:serve": "npm run web:export && npx serve dist",
-
     "prod:local": "node -e \"console.log('Use: .\\\\scripts\\\\run-prod-local.ps1 (Windows) or ./scripts/run-prod-local.sh (Unix)')\"",
     "prod:build": "expo export --platform web --output-dir dist",
     "prod:serve": "expo start --no-dev --minify",
-
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
     "@react-navigation/native": "^7.1.17",
     "@react-navigation/native-stack": "^7.3.26",
     "dayjs": "^1.11.18",
@@ -33,13 +31,13 @@
     "expo-location": "^19.0.7",
     "expo-notifications": "^0.32.11",
     "expo-print": "^15.0.7",
-  "expo-router": "^3.5.24",
+    "expo-router": "^3.5.24",
     "expo-sharing": "^14.0.7",
     "expo-sqlite": "^16.0.8",
     "expo-status-bar": "~3.0.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-  "react-native": "0.76.6",
+    "react-native": "0.76.6",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-screens": "^4.16.0",
     "react-native-web": "^0.21.1",
