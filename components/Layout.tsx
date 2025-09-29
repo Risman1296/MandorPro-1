@@ -108,9 +108,10 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
               left: 0,
               width: 280,
               backgroundColor: 'white',
-              shadowColor: '#000',
-              shadowOpacity: 0.2,
-              shadowRadius: 12,
+              ...(Platform.select({
+                web: { boxShadow: '4px 0 12px rgba(0,0,0,0.2)' },
+                default: { shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 12 },
+              }) as any),
             }}
           >
             <Sidebar collapsed={false} onToggle={() => setDrawerOpen(false)} items={NAV_TREE} />

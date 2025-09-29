@@ -492,11 +492,16 @@ const styles = StyleSheet.create({
     borderRightColor: '#e2e8f0',
     width: 280,
     height: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    ...Platform.select({
+      web: { boxShadow: '2px 0 10px rgba(0,0,0,0.05)' },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 3,
+      },
+    }),
   },
   collapsedContainer: {
     width: 72,
