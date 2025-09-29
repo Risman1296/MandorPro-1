@@ -41,6 +41,7 @@ yarn-error.*
 /ios
 /android
 google-services.json
+google-play-service-account.json
 
 # editors/IDE local settings
 .vscode/
