@@ -1,0 +1,60 @@
+name: mandorpro_flutter
+description: MandorPro - Flutter Construction Management App
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # UI & State Management
+  cupertino_icons: ^1.0.6
+
+  # Internationalization
+  intl: ^0.19.0
+
+  # Database
+  sqflite: ^2.3.0
+  path: ^1.8.3
+
+  # HTTP & Networking
+  http: ^1.1.0
+
+  # Utility
+  uuid: ^4.1.0
+  share_plus: ^7.2.1
+
+  # Date & Time
+  jiffy: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Assets
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # Fonts
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-Regular.ttf
+        - asset: fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Inter-Bold.ttf
+          weight: 700
