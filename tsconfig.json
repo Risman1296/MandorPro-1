@@ -4,6 +4,12 @@
     "strict": true,
     "jsx": "react-jsx",
     "module": "ESNext",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "*"
+      ]
+    }
   }
 }

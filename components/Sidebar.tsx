@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Link, usePathname } from 'expo-router';
 import type { NavNode } from '../src/data/navTree';
-import { Icon } from '../src/ui/Icon';
+import { Icon } from '@/src/ui/Icon';
 
 // Professional icon mapping using Unicode symbols (fallback)
 const IconMap: { [key: string]: string } = {

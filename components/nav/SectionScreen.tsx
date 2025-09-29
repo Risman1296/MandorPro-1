@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, Text } from 'react-native';
+import { Link } from 'expo-router';
 import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
 import { NAV_TREE, SubTab } from '../../src/data/navTree';
 import TabBar from './TabBar';
@@ -54,7 +55,15 @@ export default function SectionScreen() {
   if (!current) {
     return (
       <PageContainer>
-        <Text>Section not found: {sectionId}</Text>
+        <View style={{ padding: 16, gap: 8 }}>
+          <Text style={{ fontWeight: '700', fontSize: 18 }}>Section tidak ditemukan</Text>
+          <Text style={{ color: '#64748b' }}>
+            Bagian yang kamu akses belum terdaftar di menu.
+          </Text>
+          <Link href="/dashboard">
+            <Text style={{ color: '#2563eb', marginTop: 8 }}>← Kembali ke Dashboard</Text>
+          </Link>
+        </View>
       </PageContainer>
     );
   }
