@@ -7,9 +7,17 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "web:clear": "expo start --web --clear",
+
+    "web:export": "expo export --platform web -o dist",
+    "web:serve": "npm run web:export && npx serve dist",
+
     "prod:local": "node -e \"console.log('Use: .\\\\scripts\\\\run-prod-local.ps1 (Windows) or ./scripts/run-prod-local.sh (Unix)')\"",
     "prod:build": "expo export --platform web --output-dir dist",
-    "prod:serve": "expo start --no-dev --minify"
+    "prod:serve": "expo start --no-dev --minify",
+
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@react-navigation/native": "^7.1.17",
