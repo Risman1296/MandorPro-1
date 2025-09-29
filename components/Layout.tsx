@@ -46,20 +46,26 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
   }, [drawerOpen, isDesktop]);
 
   return (
-    <View style={{ minHeight: '100%', backgroundColor: 'white' }}>
-      {/* Desktop: fixed sidebar */}
+    <View style={{ 
+      flexDirection: isDesktop ? 'row' : 'column',
+      backgroundColor: '#f8fafc',
+      flex: 1,
+      ...(Platform.select({
+        web: { minHeight: '100vh' },
+        default: {},
+      }) as any)
+    }}>
+      {/* Desktop: sidebar */}
       {isDesktop && (
         <View
           style={{
-            position: 'fixed' as any,
-            top: 0,
-            left: 0,
-            bottom: 0,
             width: sidebarWidth,
             borderRightWidth: 1,
             borderRightColor: '#e5e7eb',
             backgroundColor: 'white',
-          }}
+            transitionProperty: 'width',
+            transitionDuration: '200ms',
+          } as any}
         >
           <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} items={NAV_TREE} />
         </View>
@@ -122,12 +128,14 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
       {/* Content */}
       <View
         style={{
-          paddingLeft: isDesktop ? sidebarWidth : 0,
-          transitionProperty: 'padding-left',
-          transitionDuration: '200ms',
-        } as any}
+          flex: 1,
+          minWidth: 0,
+          minHeight: 0,
+          backgroundColor: '#fff',
+          ...(Platform.select({ web: { overflow: 'auto' } }) as any)
+        }}
       >
-        <View style={{ maxWidth: 1200, width: '100%', paddingHorizontal: 16, paddingVertical: 16 }}>
+        <View style={{ width: '100%', paddingHorizontal: 24, paddingVertical: 24, minWidth: 0, minHeight: 0 }}>
           {children}
         </View>
       </View>

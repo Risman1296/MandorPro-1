@@ -1,7 +1,18 @@
 import { Stack } from 'expo-router';
+import { useEffect } from 'react';
 import Layout from '@/components/Layout';
+import { setupNotifications } from '@/src/services/push';
+import { initDb } from '@/src/db/boot';
+import { ensureDemoSeed } from '@/src/db/seed';
 
 export default function RootLayout() {
+  useEffect(() => {
+    // fire-and-forget setup; errors are non-fatal
+  setupNotifications().catch(() => {});
+  initDb()
+    .then(() => ensureDemoSeed(false))
+    .catch(() => {});
+  }, []);
   return (
     <Layout>
       <Stack screenOptions={{ headerShown: false }}>

@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, Text } from 'react-native';
-import { Link } from 'expo-router';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
 import { NAV_TREE, SubTab } from '../../src/data/navTree';
 import TabBar from './TabBar';
 import SubTabBar from './SubTabBar';
 import PageContainer from './PageContainer';
+import StockList from '../material/StockList';
+import UsageList from '../material/UsageList';
+import WeeklyExport from '../reports/WeeklyExport';
+import DailyReport from '../reports/DailyReport';
 
 export default function SectionScreen() {
   const router = useRouter();
@@ -54,22 +57,22 @@ export default function SectionScreen() {
 
   if (!current) {
     return (
-      <PageContainer>
+      <PageContainer fluid>
         <View style={{ padding: 16, gap: 8 }}>
           <Text style={{ fontWeight: '700', fontSize: 18 }}>Section tidak ditemukan</Text>
           <Text style={{ color: '#64748b' }}>
             Bagian yang kamu akses belum terdaftar di menu.
           </Text>
-          <Link href="/dashboard">
+          <Pressable onPress={() => router.push('/dashboard')} accessibilityRole="link">
             <Text style={{ color: '#2563eb', marginTop: 8 }}>← Kembali ke Dashboard</Text>
-          </Link>
+          </Pressable>
         </View>
       </PageContainer>
     );
   }
 
   return (
-    <PageContainer>
+    <PageContainer fluid>
       {!!tabs.length && (
         <TabBar
           items={tabs.map((t) => ({ id: t.id, label: t.label }))}
@@ -87,17 +90,46 @@ export default function SectionScreen() {
         />
       )}
 
-      {/* Content placeholder; replace with real components as needed */}
-      <View style={{ paddingTop: 12 }}>
+      {/* Content */}
+      <View style={styles.content}>
         <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 8 }}>
           {current.label}
           {activeTabId ? ` / ${activeTab?.label}` : ''}
           {activeSubId ? ` / ${subTabs.find((s: SubTab) => s.id === activeSubId)?.label}` : ''}
         </Text>
-        <Text style={{ color: '#475569' }}>
-          This is a data-driven SectionScreen using URL as source of truth.
-        </Text>
+        {/* Material: Stock */}
+        {current.id === 'material' && activeTabId === 'stock' && (
+          <StockList />
+        )}
+        {/* Material: Usage */}
+        {current.id === 'material' && activeTabId === 'usage' && (
+          <UsageList />
+        )}
+        {/* Laporan: Export */}
+        {current.id === 'laporan' && activeTabId === 'export' && (
+          <WeeklyExport />
+        )}
+        {/* Laporan: Harian */}
+        {current.id === 'laporan' && activeTabId === 'daily' && (
+          <DailyReport />
+        )}
+        {/* Report (legacy section) tab daily */}
+        {current.id === 'report' && activeTabId === 'daily' && (
+          <DailyReport />
+        )}
+        {/* Default helper text */}
+        {!(current.id === 'material' && (activeTabId === 'stock' || activeTabId === 'usage')) &&
+          !(current.id === 'laporan' && (activeTabId === 'export' || activeTabId === 'daily')) &&
+          !(current.id === 'report' && activeTabId === 'daily') && (
+          <Text style={{ color: '#475569' }}>
+            This is a data-driven SectionScreen using URL as source of truth.
+          </Text>
+        )}
       </View>
     </PageContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  content: { flex: 1, minWidth: 0, minHeight: 0, paddingTop: 12 },
+});

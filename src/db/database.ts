@@ -1,5 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import { Platform } from 'react-native';
+import { all, run } from '@/src/db/adapters';
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 
@@ -216,4 +217,52 @@ export async function migrate() {
     console.error('Database migration failed:', error);
     throw error;
   }
+}
+
+// Admin DB helpers (scope-aware for schema.ts with scope column)
+export async function getCounts(scope = 'DEMO') {
+  const q = async (sql: string, args: any[] = []) => {
+    const rows = await all(sql, args);
+    const first: any = Array.isArray(rows) ? rows[0] : undefined;
+    return first?.c ?? 0;
+  };
+  return {
+    materials: await q('SELECT COUNT(*) c FROM materials WHERE scope=?', [scope]),
+    ledger: await q('SELECT COUNT(*) c FROM material_ledger WHERE scope=?', [scope]).catch(async () =>
+      // fallback to stock_ledger name in older schema
+      await q('SELECT COUNT(*) c FROM stock_ledger WHERE project_id=?', [scope])
+    ),
+    workers: await q('SELECT COUNT(*) c FROM workers WHERE scope=?', [scope]).catch(async () =>
+      await q('SELECT COUNT(*) c FROM workers WHERE active=1')
+    ),
+    projects: await q('SELECT COUNT(*) c FROM projects WHERE scope=?', [scope]).catch(async () =>
+      await q('SELECT COUNT(*) c FROM projects')
+    ),
+    attendance: await q('SELECT COUNT(*) c FROM attendance WHERE scope=?', [scope]).catch(async () =>
+      await q('SELECT COUNT(*) c FROM attendance')
+    ),
+  };
+}
+
+export async function vacuum() {
+  try { await run('VACUUM'); } catch {}
+}
+
+export async function exportScopeAsJson(scope = 'DEMO') {
+  const tryAll = async (sql: string, args: any[] = []) => {
+    try { return await all(sql, args); } catch { return []; }
+  };
+  const dump = {
+    materials: await tryAll('SELECT * FROM materials WHERE scope=?', [scope]),
+    material_ledger: await tryAll('SELECT * FROM material_ledger WHERE scope=?', [scope]),
+    workers: await tryAll('SELECT * FROM workers WHERE scope=?', [scope]),
+    projects: await tryAll('SELECT * FROM projects WHERE scope=?', [scope]),
+    attendance: await tryAll('SELECT * FROM attendance WHERE scope=?', [scope]),
+  } as Record<string, any[]>;
+  // Fallback for legacy table names/columns
+  if (!dump.material_ledger.length) dump.material_ledger = await tryAll('SELECT * FROM stock_ledger WHERE project_id=?', [scope]);
+  if (!dump.workers.length) dump.workers = await tryAll('SELECT * FROM workers WHERE active=1');
+  if (!dump.projects.length) dump.projects = await tryAll('SELECT * FROM projects');
+  if (!dump.attendance.length) dump.attendance = await tryAll('SELECT * FROM attendance');
+  return JSON.stringify(dump, null, 2);
 }

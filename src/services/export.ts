@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
+import { Platform } from 'react-native';
 
 // Export data to Excel format
 export async function exportExcel(
@@ -34,6 +35,94 @@ export async function exportExcel(
     console.error('Excel export failed:', error);
     throw new Error('Gagal export Excel: ' + (error as Error).message);
   }
+}
+
+// Generic CSV/Excel helpers (web + native)
+
+function csvEscape(v: unknown) {
+  return '"' + String(v ?? '').replace(/"/g, '""') + '"';
+}
+
+function projectRowsWithColumns(rows: any[], columns?: { key: string; header?: string }[]) {
+  if (!columns || !columns.length) return rows;
+  const headerMap = Object.fromEntries(columns.map(c => [c.key, c.header ?? c.key]));
+  return rows.map((r) => {
+    const obj: Record<string, any> = {};
+    for (const c of columns) obj[headerMap[c.key]] = r?.[c.key];
+    return obj;
+  });
+}
+
+export async function exportCsvTable(
+  rows: any[],
+  baseName: string,
+  columns?: { key: string; header?: string }[],
+): Promise<void | string> {
+  const projected = projectRowsWithColumns(rows, columns);
+  const headers = projected.length ? Object.keys(projected[0]) : (columns?.map(c => c.header ?? c.key) ?? []);
+  const lines = [headers.join(',')].concat(
+    projected.map((r) => headers.map((h) => csvEscape((r as any)[h])).join(','))
+  );
+  const csv = lines.join('\n');
+  const filename = `${baseName}.csv`;
+
+  if (Platform.OS === 'web') {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = (globalThis as any).document?.createElement?.('a');
+    if (a) {
+      a.href = url; a.download = filename; a.style.display = 'none';
+      (globalThis as any).document.body.appendChild(a); a.click();
+      (globalThis as any).document.body.removeChild(a);
+    }
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  const fileUri = (FileSystem as any).cacheDirectory + filename;
+  await FileSystem.writeAsStringAsync(fileUri, csv, { encoding: (FileSystem as any).EncodingType.UTF8 });
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(fileUri, { mimeType: 'text/csv', dialogTitle: 'Export CSV' });
+  }
+  return fileUri;
+}
+
+export async function exportExcelTable(
+  rows: any[],
+  baseName: string,
+  sheetName: string = 'Sheet1',
+  columns?: { key: string; header?: string }[],
+): Promise<void | string> {
+  const projected = projectRowsWithColumns(rows, columns);
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(projected);
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  const filename = `${baseName}.xlsx`;
+
+  if (Platform.OS === 'web') {
+    const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = (globalThis as any).document?.createElement?.('a');
+    if (a) {
+      a.href = url; a.download = filename; a.style.display = 'none';
+      (globalThis as any).document.body.appendChild(a); a.click();
+      (globalThis as any).document.body.removeChild(a);
+    }
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  const base64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+  const fileUri = (FileSystem as any).cacheDirectory + filename;
+  await FileSystem.writeAsStringAsync(fileUri, base64, { encoding: (FileSystem as any).EncodingType.Base64 });
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(fileUri, {
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      dialogTitle: 'Export Excel',
+    });
+  }
+  return fileUri;
 }
 
 // Export data to PDF format

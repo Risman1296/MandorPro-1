@@ -158,3 +158,11 @@ export async function safeRunAsync(sql: string, params: any[] = []): Promise<any
     throw error;
   }
 }
+
+// Aliases to match simple helper naming used by seed/admin utilities
+export const all = safeGetAllAsync;
+export const get = async <T = any>(sql: string, params: any[] = []): Promise<T | undefined> => {
+  const row = await safeGetFirstAsync(sql, params);
+  return row as T | undefined;
+};
+export const run = safeRunAsync;

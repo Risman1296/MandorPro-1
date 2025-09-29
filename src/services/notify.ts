@@ -7,6 +7,7 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
+    // Required by NotificationBehavior type on newer Expo SDKs
     shouldShowBanner: true,
     shouldShowList: true,
   }),
@@ -40,7 +41,6 @@ export async function scheduleDailyReminder(
 ): Promise<string> {
   try {
     const identifier = await Notifications.scheduleNotificationAsync({
-      identifier: id,
       content: {
         title,
         body,
@@ -122,7 +122,6 @@ export async function scheduleSuperviseorDailyReminders(): Promise<void> {
 export async function scheduleWeeklyReport(dayOfWeek: number = 5, hour: number = 16): Promise<string> {
   try {
     return await Notifications.scheduleNotificationAsync({
-      identifier: 'weekly-report',
       content: {
         title: 'Laporan Mingguan',
         body: 'Saatnya menyiapkan laporan mingguan proyek',

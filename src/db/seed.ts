@@ -1,3 +1,115 @@
+import * as FileSystem from "expo-file-system";
+import { Asset } from "expo-asset";
+
+function parseCsv(text: string): string[][] {
+  return text
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => line.split(",").map((s) => s.trim()))
+    .filter((row) => row.length > 0);
+}
+
+async function loadTextFromAsset(mod: any): Promise<string | null> {
+  try {
+    const asset = Asset.fromModule(mod);
+    await asset.downloadAsync();
+    const uri = asset.localUri ?? asset.uri;
+    return await FileSystem.readAsStringAsync(uri, {
+      encoding: (FileSystem as any).EncodingType.UTF8,
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function ensureSeededWith(
+  run: (sql: string, params?: any[]) => Promise<any>,
+  get: <T = any>(sql: string, params?: any[]) => Promise<T | undefined>
+) {
+  const seeded = await get<{ value: string }>("SELECT value FROM kv WHERE key='seed_v1';");
+  if (seeded && (seeded as any).value === "1") return;
+
+  // Seed materials from assets/data/materials.csv
+  try {
+    // @ts-ignore - packager resolves this
+    const materialsCsv = await loadTextFromAsset(require("../../assets/data/materials.csv"));
+    if (materialsCsv) {
+      const rows = parseCsv(materialsCsv);
+      const [header, ...data] = rows;
+      const idx = (k: string) => header.indexOf(k);
+      const idxName = idx("name");
+      const idxUom = idx("uom");
+      for (const r of data) {
+        const name = r[idxName];
+        if (!name) continue;
+        const unit = idxUom >= 0 ? r[idxUom] : null;
+        const scope = "DEMO";
+        const id = `MAT-${Math.random().toString(36).slice(2, 9)}`;
+        await run(
+          `INSERT OR IGNORE INTO materials (id,name,unit,total_in,total_out,scope) VALUES (?,?,?,?,?,?);`,
+          [id, name, unit, 0, 0, scope]
+        );
+      }
+    }
+  } catch {}
+
+  // Seed workers from assets/data/labor_rates.csv
+  try {
+    // @ts-ignore - packager resolves this
+    const laborCsv = await loadTextFromAsset(require("../../assets/data/labor_rates.csv"));
+    if (laborCsv) {
+      const rows = parseCsv(laborCsv);
+      const [header, ...data] = rows;
+      const idx = (k: string) => header.indexOf(k);
+      const idxName = idx("name");
+      const idxPrice = idx("price");
+      for (const r of data) {
+        const name = r[idxName];
+        if (!name) continue;
+        const rate = idxPrice >= 0 ? Number(r[idxPrice] || 0) : 0;
+        const role = null;
+        const scope = "DEMO";
+        const id = `WRK-${Math.random().toString(36).slice(2, 9)}`;
+        await run(
+          `INSERT OR IGNORE INTO workers (id,name,role,rate,active,scope) VALUES (?,?,?,?,1,?);`,
+          [id, name, role, rate, scope]
+        );
+      }
+    }
+  } catch {}
+
+  await run("INSERT OR REPLACE INTO kv (key,value) VALUES ('seed_v1','1');");
+}
+// Minimal DEMO seed/wipe helpers compatible with schema.ts
+import { run as runAdapter, get as getAdapter } from '@/src/db/adapters';
+
+export async function ensureDemoSeed(force = false) {
+  const row = await getAdapter<{ value: string }>("SELECT value FROM kv WHERE key='demo_seeded'");
+  if (!force && row?.value === '1') return;
+
+  await runAdapter(
+    `INSERT OR IGNORE INTO materials (id,name,unit,total_in,total_out,scope)
+     VALUES ('MAT-DEMO-SEMEN','Semen','sak',100,12,'DEMO')`
+  );
+  await runAdapter(
+    `INSERT OR IGNORE INTO workers (id,name,role,rate,active,scope)
+     VALUES ('WRK-DEMO-BUDI','Budi','Tukang',120000,1,'DEMO')`
+  );
+  await runAdapter(
+    `INSERT OR IGNORE INTO projects (id,code,name,status,scope)
+     VALUES ('PRJ-DEMO-001','PRJ-001','Renovasi Rumah A','active','DEMO')`
+  );
+  await runAdapter("INSERT OR REPLACE INTO kv (key,value) VALUES ('demo_seeded','1')");
+}
+
+export async function wipeDemoData() {
+  await runAdapter(`DELETE FROM attendance WHERE scope='DEMO'`);
+  await runAdapter(`DELETE FROM material_ledger WHERE scope='DEMO'`);
+  await runAdapter(`DELETE FROM materials WHERE scope='DEMO'`);
+  await runAdapter(`DELETE FROM workers WHERE scope='DEMO'`);
+  await runAdapter(`DELETE FROM projects WHERE scope='DEMO'`);
+  await runAdapter("INSERT OR REPLACE INTO kv (key,value) VALUES ('demo_seeded','0')");
+}
 // Database seeding utilities
 import { Platform } from 'react-native';
 import { getDB, initDB } from '@/src/db/index';

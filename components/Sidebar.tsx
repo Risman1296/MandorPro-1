@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, Pressable, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
-import { Link, usePathname } from 'expo-router';
+import { View, Text, Pressable, StyleSheet, ScrollView, Platform } from 'react-native';
+import { usePathname, useRouter } from 'expo-router';
 import type { NavNode } from '../src/data/navTree';
 import { Icon } from '@/src/ui/Icon';
+import { sx } from '@/src/lib/sx';
 
 // Professional icon mapping using Unicode symbols (fallback)
 const IconMap: { [key: string]: string } = {
@@ -302,6 +303,14 @@ const baseMenuItems: MenuItem[] = [
     icon: 'settings-outline',
     route: '/settings',
   },
+  {
+    id: 'admin',
+    name: 'Admin',
+    icon: 'construct',
+    subItems: [
+      { id: 'admin-db', name: 'Database', icon: 'document-text-outline', route: '/admin/database' },
+    ],
+  },
 ];
 
 // Merge provided NAV items with existing base menu, avoiding duplicates by id (NAV first)
@@ -331,6 +340,7 @@ interface SidebarProps {
 export default function Sidebar({ collapsed = false, onToggle, items }: SidebarProps) {
   const menuItems = useMenuItems(items);
   const pathname = usePathname();
+  const router = useRouter();
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects']);
 
   const toggleExpanded = (itemId: string) => {
@@ -343,7 +353,8 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
     );
   };
 
-  const isActiveRoute = (route: string) => pathname === route || pathname.startsWith(route);
+  const isActiveRoute = (route: string) =>
+    route === '/' ? pathname === '/' : pathname === route || pathname.startsWith(route + '/');
 
   const renderMenuItem = (item: MenuItem) => {
     const hasSubItems = item.subItems && item.subItems.length > 0;
@@ -351,18 +362,20 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
     const isActive = item.route ? isActiveRoute(item.route) : false;
 
     const button = (
-        <TouchableOpacity
-          style={[
+        <Pressable
+          style={sx(
             styles.menuButton,
             isActive && styles.activeMenuButton,
             collapsed && styles.collapsedMenuButton,
-          ]}
+          )}
           onPress={() => {
             if (hasSubItems) {
               toggleExpanded(item.id);
+            } else if (item.route) {
+              router.push(item.route);
             }
           }}
-          activeOpacity={0.7}
+          accessibilityRole={item.route && !hasSubItems ? 'link' : 'button'}
           accessibilityLabel={collapsed ? item.name : undefined}
         >
           <View style={styles.menuButtonContent}>
@@ -374,7 +387,7 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
             />
             {!collapsed && (
               <>
-                <Text style={[styles.menuText, isActive && styles.activeMenuText]}>
+                <Text style={sx(styles.menuText, isActive && styles.activeMenuText)}>
                   {item.name}
                 </Text>
                 {hasSubItems && (
@@ -387,44 +400,38 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
               </>
             )}
           </View>
-        </TouchableOpacity>
+        </Pressable>
     );
     return (
       <View key={item.id} style={styles.menuItem}>
-        {item.route && !hasSubItems ? (
-          <Link href={item.route} asChild>
-            {button}
-          </Link>
-        ) : (
-          button
-        )}
+        {button}
 
         {hasSubItems && isExpanded && !collapsed && (
           <View style={styles.subMenu}>
             {item.subItems!.map((subItem) => {
               const isSubActive = isActiveRoute(subItem.route);
               return (
-                <Link key={subItem.id} href={subItem.route} asChild>
-                  <TouchableOpacity
-                    style={[
-                      styles.subMenuItem,
-                      isSubActive && styles.activeSubMenuItem,
-                    ]}
-                    activeOpacity={0.7}
-                  >
-                    <Icon
-                      name={subItem.icon}
-                      size={16}
-                      color={isSubActive ? '#3b82f6' : '#94a3b8'}
-                    />
-                    <Text style={[
-                      styles.subMenuText,
-                      isSubActive && styles.activeSubMenuText,
-                    ]}>
-                      {subItem.name}
-                    </Text>
-                  </TouchableOpacity>
-                </Link>
+                <Pressable
+                  key={subItem.id}
+                  style={sx(
+                    styles.subMenuItem,
+                    isSubActive && styles.activeSubMenuItem,
+                  )}
+                  accessibilityRole="link"
+                  onPress={() => router.push(subItem.route)}
+                >
+                  <Icon
+                    name={subItem.icon}
+                    size={16}
+                    color={isSubActive ? '#3b82f6' : '#94a3b8'}
+                  />
+                  <Text style={sx(
+                    styles.subMenuText,
+                    isSubActive && styles.activeSubMenuText,
+                  )}>
+                    {subItem.name}
+                  </Text>
+                </Pressable>
               );
             })}
           </View>
@@ -434,10 +441,10 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
   };
 
   return (
-    <View style={[
+    <View style={sx(
       styles.container,
       collapsed && styles.collapsedContainer,
-    ]}>
+    )}>
       {/* Header */}
       <View style={styles.header}>
         {!collapsed && (
@@ -448,16 +455,17 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
             <Text style={styles.logoText}>MandorPro</Text>
           </View>
         )}
-        <TouchableOpacity
-          style={[styles.toggleButton, collapsed && styles.collapsedToggleButton]}
+        <Pressable
+          style={sx(styles.toggleButton, collapsed && styles.collapsedToggleButton)}
           onPress={onToggle}
+          accessibilityRole="button"
         >
           <ProfessionalIcon
             name={collapsed ? 'menu-outline' : 'chevron-down'}
             size={20}
             color="#64748b"
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Menu Items */}
@@ -469,7 +477,7 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
 
       {/* Footer */}
       <View style={styles.footer}>
-        <View style={[styles.userProfile, collapsed && styles.collapsedUserProfile]}>
+        <View style={sx(styles.userProfile, collapsed && styles.collapsedUserProfile)}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>M</Text>
           </View>
