@@ -1,4 +1,4 @@
-import { seedDatabase, seedDatabaseSync } from '../db/seed';
+import { seedDatabase, seedDatabaseSync } from '@/src/db/seed';
 
 /**
  * Utility script to manually import data from assets into database
@@ -55,7 +55,7 @@ export function importAssetDataSync() {
 // Get import statistics
 export async function getImportStats() {
   try {
-    const { safeGetFirstAsync } = require('../db/adapters');
+    const { safeGetFirstAsync } = require('@/src/db/adapters');
     
     const stats = {
       projects: (await safeGetFirstAsync('SELECT COUNT(*) as count FROM projects'))?.count || 0,
@@ -77,7 +77,7 @@ export async function clearAllData() {
   console.log('🗑️  Clearing all data...');
   
   try {
-    const { db } = require('../db/database');
+    const { db } = require('@/src/db/database');
     
     // Clear in reverse dependency order
     db.runSync('DELETE FROM stock_ledger');

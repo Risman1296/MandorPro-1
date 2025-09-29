@@ -1,5 +1,5 @@
 // Database Adapters - Web-friendly async operations
-import { getDB } from './index';
+import { getDB } from '@/src/db/index';
 
 // Database adapter that works on both web and native
 class DatabaseAdapter {

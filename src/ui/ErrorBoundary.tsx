@@ -1,7 +1,7 @@
 // Error Boundary Component
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { theme } from './theme';
+import { theme } from '@/src/ui/theme';
 
 interface Props {
   children: ReactNode;

@@ -1,7 +1,7 @@
 // Unit System Demo & Testing
 // Contoh penggunaan sistem unit untuk berbagai keperluan
 
-import { UNITS, generateUnits, generateUnitsQuick, getUnitsByBlock, getBlockList } from './units';
+import { UNITS, generateUnits, generateUnitsQuick, getUnitsByBlock, getBlockList } from '@/src/data/units';
 
 console.log('=== UNIT SYSTEM DEMO ===\n');
 

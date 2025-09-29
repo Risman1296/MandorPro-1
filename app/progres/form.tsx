@@ -9,15 +9,15 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
-import { Card, Button, Input, SectionHeader, StatusBadge } from '../../src/ui/components';
-import { theme } from '../../src/ui/theme';
-import { insertUnitProgress } from '../../src/db/queries';
-import { UNITS, getBlockList } from '../../src/data/units';
-import { getCurrentDate, getCurrentTimestamp } from '../../src/utils/time';
-import { generateId } from '../../src/utils/id';
-import { percentDone } from '../../src/logic/bobot';
-import { appendDelta } from '../../src/services/outbox';
-import { saveProgressPhoto } from '../../src/services/photos';
+import { Card, Button, Input, SectionHeader, StatusBadge } from '@/src/ui/components';
+import { theme } from '@/src/ui/theme';
+import { insertUnitProgress } from '@/src/db/queries';
+import { UNITS, getBlockList } from '@/src/data/units';
+import { getCurrentDate, getCurrentTimestamp } from '@/src/utils/time';
+import { generateId } from '@/src/utils/id';
+import { percentDone } from '@/src/logic/bobot';
+import { appendDelta } from '@/src/services/outbox';
+import { saveProgressPhoto } from '@/src/services/photos';
 
 // Helper function to get filtered units
 const getFilteredUnits = (block: string) => {

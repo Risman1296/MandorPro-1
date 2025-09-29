@@ -14,7 +14,9 @@
     "prod:build": "expo export --platform web --output-dir dist",
     "prod:serve": "expo start --no-dev --minify",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "imports:dry": "node scripts/convert-imports-to-alias.cjs --dry app src",
+    "imports:write": "node scripts/convert-imports-to-alias.cjs --write app src"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -47,6 +49,7 @@
   },
   "devDependencies": {
     "@types/react": "~18.2.0",
+    "babel-plugin-module-resolver": "^5.0.2",
     "typescript": "~5.9.2"
   },
   "overrides": {

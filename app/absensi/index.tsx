@@ -7,12 +7,12 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import { Card, Button, SectionHeader, ListItem, StatusBadge } from '../../src/ui/components';
-import { theme } from '../../src/ui/theme';
-import { getActiveWorkers, getTodayAttendance, insertAttendance } from '../../src/db/queries';
-import { getCurrentDate, getCurrentTimestamp, formatTime } from '../../src/utils/time';
-import { generateId } from '../../src/utils/id';
-import { appendDelta } from '../../src/services/outbox';
+import { Card, Button, SectionHeader, ListItem, StatusBadge } from '@/src/ui/components';
+import { theme } from '@/src/ui/theme';
+import { getActiveWorkers, getTodayAttendance, insertAttendance } from '@/src/db/queries';
+import { getCurrentDate, getCurrentTimestamp, formatTime } from '@/src/utils/time';
+import { generateId } from '@/src/utils/id';
+import { appendDelta } from '@/src/services/outbox';
 
 export default function AttendanceScreen() {
   const [workers, setWorkers] = useState<any[]>([]);

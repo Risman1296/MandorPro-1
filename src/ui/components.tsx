@@ -10,7 +10,7 @@ import {
   TextInputProps,
   TouchableOpacityProps,
 } from 'react-native';
-import { cardShadow, buttonShadow } from './shadows';
+import { cardShadow, buttonShadow } from '@/src/ui/shadows';
 
 // Button Component
 interface ButtonProps extends TouchableOpacityProps {

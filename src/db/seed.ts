@@ -1,9 +1,9 @@
 // Database seeding utilities
 import { Platform } from 'react-native';
-import { getDB, initDB } from './index';
-import { safeRunAsync, safeGetAllAsync } from './adapters';
-import { generateId } from '../utils/id';
-import { getCurrentTimestamp } from '../utils/time';
+import { getDB, initDB } from '@/src/db/index';
+import { safeRunAsync, safeGetAllAsync } from '@/src/db/adapters';
+import { generateId } from '@/src/utils/id';
+import { getCurrentTimestamp } from '@/src/utils/time';
 
 // Mock data untuk web platform
 const mockMaterials = [
