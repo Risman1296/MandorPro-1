@@ -1,23 +1,25 @@
+const SAFE_RN = new Set([
+  'View','Text','Image','Pressable','TouchableOpacity','TouchableWithoutFeedback',
+  'ScrollView','FlatList','SectionList','TextInput','Modal','SafeAreaView'
+]);
+
 module.exports = {
-  meta: { type: 'problem', docs: { description: 'Disallow style arrays on DOM/Link/Slot' } , schema: []},
+  meta: { type: 'problem', docs: { description: 'Disallow style arrays on non-RN primitives' } , schema: []},
   create(context) {
-    const DOM = new Set(['a','div','span','img','button','input','label','ul','li','nav','main','section']);
-    const TARGET = new Set(['Link','Slot']);
     return {
       JSXAttribute(node) {
         if (node.name.name !== 'style') return;
         if (!node.value || node.value.type !== 'JSXExpressionContainer') return;
         if (node.value.expression.type !== 'ArrayExpression') return;
 
-        const parent = node.parent && node.parent.name;
-        if (!parent) return;
+        const open = node.parent && node.parent.name;
+        if (!open || open.type !== 'JSXIdentifier') return;
+        const name = open.name;
 
-        const getName = (n) => n.type === 'JSXIdentifier' ? n.name : null;
-        const name = getName(parent);
-        if (name && (DOM.has(name) || TARGET.has(name))) {
+        if (!SAFE_RN.has(name)) {
           context.report({
             node,
-            message: 'Use StyleSheet.flatten(...) or className instead of style array on DOM/Link/Slot.'
+            message: `style array is only allowed on RN primitives; found on <${name}>. Use StyleSheet.flatten(...) or className.`,
           });
         }
       }

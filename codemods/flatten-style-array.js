@@ -1,8 +1,12 @@
 /**
- * Codemod: style={[...]} -> style={StyleSheet.flatten([...])} untuk DOM/Link/Slot
+ * Codemod: style={[...]} -> style={StyleSheet.flatten([...])}
+ * Strategy: flatten ALL style arrays EXCEPT on known safe RN primitives.
+ * Bonus: Link/Slot (DOM-forwarding) will be flattened because they're not in SAFE_RN.
  */
-const DOM_NAMES = new Set(['a','div','span','img','button','input','label','ul','li','nav','main','section']);
-const TARGET_NAMES = new Set(['Link','Slot']); // boleh tambah
+const SAFE_RN = new Set([
+  'View','Text','Image','Pressable','TouchableOpacity','TouchableWithoutFeedback',
+  'ScrollView','FlatList','SectionList','TextInput','Modal','SafeAreaView'
+]);
 
 module.exports = function(file, api) {
   const j = api.jscodeshift;
@@ -33,16 +37,15 @@ module.exports = function(file, api) {
     }
   };
 
-  const isTargetElement = (name) =>
-    DOM_NAMES.has(name) || TARGET_NAMES.has(name);
+  const isTargetElement = (name) => !SAFE_RN.has(name);
 
   root.find(j.JSXAttribute, { name: { name: 'style' }})
     .filter(path => path.node.value && path.node.value.expression && path.node.value.expression.type === 'ArrayExpression')
     .filter(path => {
       const el = path.parent.node.name;
-      if (el.type === 'JSXIdentifier') return isTargetElement(el.name);
-      if (el.type === 'JSXMemberExpression') return false;
-      return false;
+      if (el.type !== 'JSXIdentifier') return false;
+      const name = el.name;
+      return isTargetElement(name);
     })
     .forEach(path => {
       ensureImport();
