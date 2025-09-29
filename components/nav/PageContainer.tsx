@@ -1,22 +1,23 @@
 import React, { PropsWithChildren } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { fill, layout } from '@/src/ui/tokens';
 
 type Props = PropsWithChildren<{ fluid?: boolean }>
 
 export default function PageContainer({ children, fluid }: Props) {
+  const l = layout();
   return (
     <View style={styles.root}>
-      <View style={[styles.content, fluid && styles.fluid]}>{children}</View>
+      <View style={[styles.content, { padding: l.contentPadding }, fluid && styles.fluid]}>{children}</View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, minHeight: 0 },
+  root: { ...fill },
   content: {
     flex: 1,
     width: '100%',
-    padding: 16,
     backgroundColor: '#f8fafc',
     minWidth: 0,
     minHeight: 0,

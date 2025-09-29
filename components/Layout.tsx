@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Platform, View, useWindowDimensions, Pressable, Text } from 'react-native';
 import Sidebar from './Sidebar';
+import { sidebar as SB, spacing } from '@/src/ui/tokens';
 import { NAV_TREE } from '../src/data/navTree';
 
-const SB_EXPANDED = 240;
-const SB_COLLAPSED = 72;
+const SB_EXPANDED = SB.drawerWidth;
+const SB_COLLAPSED = SB.railWidth;
 const DESKTOP_BP = 1024;
 
 function useIsDesktop() {
@@ -135,7 +136,7 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
           ...(Platform.select({ web: { overflow: 'auto' } }) as any)
         }}
       >
-        <View style={{ width: '100%', paddingHorizontal: 24, paddingVertical: 24, minWidth: 0, minHeight: 0 }}>
+        <View style={{ width: '100%', paddingHorizontal: spacing.lg, paddingVertical: spacing.lg, minWidth: 0, minHeight: 0 }}>
           {children}
         </View>
       </View>
