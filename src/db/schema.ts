@@ -63,5 +63,72 @@ export const MIGRATIONS = [
          scope TEXT NOT NULL DEFAULT 'DEMO'
        );`
     ]
+  },
+  {
+    to: 2,
+    statements: [
+      `DROP TABLE IF EXISTS attendance;`,
+      `CREATE TABLE attendance (
+         id TEXT PRIMARY KEY,
+         worker_id TEXT NOT NULL REFERENCES workers(id),
+         project_id TEXT NOT NULL REFERENCES projects(id),
+         type TEXT NOT NULL,
+         at_ts INTEGER NOT NULL,
+         lat REAL,
+         lng REAL,
+         accuracy REAL,
+         method TEXT,
+         note TEXT,
+         scope TEXT NOT NULL DEFAULT 'DEMO'
+       );`,
+      `CREATE TABLE tasks (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id),
+        title TEXT NOT NULL,
+        desc TEXT,
+        assignee_id TEXT REFERENCES workers(id),
+        start_at INTEGER,
+        due_at INTEGER,
+        status TEXT NOT NULL DEFAULT 'todo',
+        priority TEXT,
+        progress INTEGER DEFAULT 0,
+        scope TEXT NOT NULL DEFAULT 'DEMO'
+      );`,
+      `CREATE INDEX idx_tasks_project ON tasks(project_id);`,
+      `CREATE INDEX idx_tasks_assignee ON tasks(assignee_id);`,
+      `CREATE INDEX idx_tasks_due ON tasks(due_at);`,
+      `CREATE TABLE task_dependencies (
+        id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL REFERENCES tasks(id),
+        depends_on_task_id TEXT NOT NULL REFERENCES tasks(id),
+        scope TEXT NOT NULL DEFAULT 'DEMO'
+      );`,
+      `CREATE TABLE milestones (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id),
+        name TEXT NOT NULL,
+        at_date INTEGER NOT NULL,
+        note TEXT,
+        scope TEXT NOT NULL DEFAULT 'DEMO'
+      );`,
+      `CREATE TABLE timesheets (
+        worker_id TEXT NOT NULL REFERENCES workers(id),
+        project_id TEXT NOT NULL REFERENCES projects(id),
+        date TEXT NOT NULL,
+        minutes_worked INTEGER DEFAULT 0,
+        overtime_minutes INTEGER DEFAULT 0,
+        scope TEXT NOT NULL DEFAULT 'DEMO',
+        PRIMARY KEY (worker_id, project_id, date)
+      );`,
+      `CREATE TABLE project_sites (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id),
+        name TEXT NOT NULL,
+        lat REAL NOT NULL,
+        lng REAL NOT NULL,
+        radius_m INTEGER NOT NULL,
+        scope TEXT NOT NULL DEFAULT 'DEMO'
+      );`
+    ]
   }
 ] as const;

@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+export * from '../schemas/project';
+export * from '../schemas/people';
+
 export type ID = string; // use uuid()
 
 // Projects and Units
@@ -54,17 +57,6 @@ export const Worker = z.object({
   active: z.boolean().default(true) 
 });
 
-export const Attendance = z.object({ 
-  id: z.string(), 
-  worker_id: z.string(), 
-  project_id: z.string(), 
-  date: z.string(), 
-  check_in_time: z.string().nullable(), 
-  check_out_time: z.string().nullable(), 
-  method: z.string().nullable(), 
-  device_id: z.string().nullable() 
-});
-
 // Payroll
 export const PayrollWeek = z.object({ 
   id: z.string(), 
@@ -114,7 +106,6 @@ export type TUnit = z.infer<typeof Unit>;
 export type TWbsItem = z.infer<typeof WbsItem>;
 export type TUnitProgress = z.infer<typeof UnitProgress>;
 export type TWorker = z.infer<typeof Worker>;
-export type TAttendance = z.infer<typeof Attendance>;
 export type TPayrollWeek = z.infer<typeof PayrollWeek>;
 export type TPayrollLine = z.infer<typeof PayrollLine>;
 export type TMaterial = z.infer<typeof Material>;

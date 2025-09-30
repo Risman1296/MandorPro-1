@@ -43,6 +43,10 @@ yarn-error.*
 google-services.json
 google-play-service-account.json
 
+# Ignore sqlite db files (local/demo database files)
+*.sqlite
+migrations/*.sqlite
+
 # editors/IDE local settings
 .vscode/
 .idea/

@@ -2,7 +2,8 @@
 
 Aplikasi manajemen proyek konstruksi berbasis **Expo Router** (React Native 0.81, React 19) dengan target **Android/iOS/Web**.
 
-> **Status**: Release Candidate (android-v0.1.0-rc.1) – fitur inti siap dipakai; sebagian halaman lanjutan masih placeholder.
+> **Status**: Release Candidate (android-v0.1.0-rc.1) – fitur inti siap dipakai; sebagian halaman lanjutan masih placeholder.  
+> **Release notes**: [Lihat catatan rilis](./RELEASE_NOTES.md)
 
 ---
 
@@ -110,6 +111,22 @@ npx expo start --clear
    * **Isi Demo** / **Hapus Demo** (hanya scope `DEMO`)
    * **Export JSON**, **VACUUM**, ringkasan count
 
+### Migrasi & Seed SQL (opsional)
+
+Tersedia file SQL final:
+
+- `migrations/001_init.sqlite` – schema lengkap
+- `migrations/001_seed.sqlite` – data demo
+
+Jalankan dari kode:
+
+```ts
+import { migrateAndSeed } from '@/src/db/migrate';
+await migrateAndSeed();
+```
+
+Catatan: Pada Web (dev), DB memakai mock sehingga migrasi dilewati.
+
 ---
 
 ## 🔔 Notifikasi (FCM)
@@ -215,3 +232,15 @@ npm run eas:submit:android
 ## � Lisensi
 
 Internal / proprietary (tentukan sesuai kebutuhan).
+
+## Fitur Kegiatan Berdasarkan Tujuan Aplikasi
+
+Fitur kegiatan merupakan aktivitas utama yang mendukung pengelolaan dan monitoring proyek konstruksi. Fitur-fitur yang harus ada antara lain:
+
+- **Dashboard Proyek**: Menampilkan overview progres, status tugas, dan jadwal harian.
+- **Manajemen Tugas & Penjadwalan**: Pembuatan, penugasan, serta update status tugas; dilengkapi dengan kalender dan timeline proyek.
+- **Absensi & Check-In**: Absensi berbasis GPS dengan fitur check-in/out real-time dan rekap kehadiran.
+- **Input Progres & Dokumentasi**: Pengunggahan foto kegiatan, pencatatan progres lapangan, dan integrasi data lapangan secara real-time.
+- **Notifikasi & Reminder**: Otomatisasi push notification untuk reminder tugas, check-in, dan update status proyek.
+- **Laporan & Analitik**: Laporan harian, mingguan, dan bulanan yang lengkap dengan visualisasi data dan analisa tren.
+- **Integrasi & Sinkronisasi**: Sinkronisasi data antara aplikasi mobile dan sistem pusat secara real-time untuk menjaga konsistensi informasi.
