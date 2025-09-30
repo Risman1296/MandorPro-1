@@ -1,3 +1,7 @@
+
+export async function deleteWorker(id: string) {
+  return run(`DELETE FROM workers WHERE id = ?`, [id]);
+}
 import { run, all } from './db-helpers';
 
 export type WorkerStatus = 'Aktif' | 'Cuti' | 'Libur' | 'Resign';
