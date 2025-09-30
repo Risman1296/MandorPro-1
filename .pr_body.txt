@@ -1,0 +1,21 @@
+Align Sidebar IDs with NAV_TREE and fix Dashboard active-state
+
+- Normalize `baseMenuItems` IDs to singular (`project`, `worker`, `material`, `report`) to match `NAV_TREE` and remove duplicate menu entries when merging.
+- Change Dashboard route to `/dashboard` for consistency with root redirect.
+- Strengthen `isActiveRoute` to treat `/`, `/dashboard`, and its subpaths as active for Dashboard.
+- Adjust `useMenuItems` mapping so `NAV_TREE` tabs are represented as `subItems` in the menu when present.
+- Update initial `expandedItems` from `['projects']` to `['project']`.
+
+Why
+
+Previously there was a mismatch between menu IDs (e.g. `projects` vs `project`) which caused duplicate items in the sidebar when combining `NAV_TREE` plus `baseMenuItems`. Also Dashboard wasn't consistently marked active because the app redirects `/` to `/dashboard`.
+
+Testing notes
+
+- Visit `/dashboard` → Dashboard should be highlighted as active.
+- Visit `/project/management` → Project menu active, no duplicate menu entries for Project/Worker/Material/Report.
+- Menu entries generated from `NAV_TREE` with `tabs` should appear as `subItems`.
+
+Chore
+
+No DB/schema changes. Changes are limited to the navigation UI component: `components/Sidebar.tsx`.
