@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'expo-router';
 import type { NavNode } from '../src/data/navTree';
 import { Icon } from '@/src/ui/Icon';
 import { sx } from '@/src/lib/sx';
+import { colors, sidebar as SB } from '@/src/ui/tokens';
 
 // Professional icon mapping using Unicode symbols (fallback)
 const IconMap: { [key: string]: string } = {
@@ -245,10 +246,10 @@ const baseMenuItems: MenuItem[] = [
     id: 'dashboard',
     name: 'Dashboard',
     icon: 'grid-outline',
-    route: '/',
+    route: '/dashboard',
   },
   {
-    id: 'projects',
+    id: 'project',
     name: 'Proyek',
     icon: 'briefcase-outline',
     subItems: [
@@ -258,7 +259,7 @@ const baseMenuItems: MenuItem[] = [
     ],
   },
   {
-    id: 'workers',
+    id: 'worker',
     name: 'Pekerja',
     icon: 'people-outline',
     subItems: [
@@ -268,7 +269,7 @@ const baseMenuItems: MenuItem[] = [
     ],
   },
   {
-    id: 'materials',
+    id: 'material',
     name: 'Material',
     icon: 'cube-outline',
     subItems: [
@@ -288,7 +289,7 @@ const baseMenuItems: MenuItem[] = [
     ],
   },
   {
-    id: 'reports',
+    id: 'report',
     name: 'Laporan',
     icon: 'document-text-outline',
     subItems: [
@@ -321,10 +322,10 @@ const useMenuItems = (navNodes?: NavNode[]): MenuItem[] => {
       name: n.label,
       icon: n.icon || (n.id === 'settings' ? 'settings-outline' : 'grid-outline'),
       route: n.path,
+      subItems: n.tabs?.map((t) => ({ id: `${n.id}-${t.id}`, name: t.label, icon: 'list-outline', route: `${n.path}/${t.id}` })) as any,
     }));
 
-    if (!navItems.length) return baseMenuItems;
-
+  if (!navItems.length) return baseMenuItems;
     const idsFromNav = new Set(navItems.map((m) => m.id));
     const filteredBase = baseMenuItems.filter((m) => !idsFromNav.has(m.id));
     return [...navItems, ...filteredBase];
@@ -341,7 +342,7 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
   const menuItems = useMenuItems(items);
   const pathname = usePathname();
   const router = useRouter();
-  const [expandedItems, setExpandedItems] = useState<string[]>(['projects']);
+  const [expandedItems, setExpandedItems] = useState<string[]>(['project']);
 
   const toggleExpanded = (itemId: string) => {
     if (collapsed) return;
@@ -353,8 +354,13 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
     );
   };
 
-  const isActiveRoute = (route: string) =>
-    route === '/' ? pathname === '/' : pathname === route || pathname.startsWith(route + '/');
+  const isActiveRoute = (route: string) => {
+    // Normalize dashboard route: treat '/' and '/dashboard' as equivalent when checking active state
+    if (route === '/' || route === '/dashboard') {
+      return pathname === '/' || pathname === '/dashboard' || pathname.startsWith('/dashboard/');
+    }
+    return pathname === route || pathname.startsWith(`${route}/`);
+  };
 
   const renderMenuItem = (item: MenuItem) => {
     const hasSubItems = item.subItems && item.subItems.length > 0;
@@ -423,7 +429,7 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
                   <Icon
                     name={subItem.icon}
                     size={16}
-                    color={isSubActive ? '#3b82f6' : '#94a3b8'}
+                    color={isSubActive ? colors.primary : colors.iconMuted}
                   />
                   <Text style={sx(
                     styles.subMenuText,
@@ -450,7 +456,7 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
         {!collapsed && (
           <View style={styles.logo}>
             <View style={styles.logoIcon}>
-              <ProfessionalIcon name="construct" size={24} color="#fff" />
+              <ProfessionalIcon name="construct" size={24} color={colors.primaryOn} />
             </View>
             <Text style={styles.logoText}>MandorPro</Text>
           </View>
@@ -463,7 +469,7 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
           <ProfessionalIcon
             name={collapsed ? 'menu-outline' : 'chevron-down'}
             size={20}
-            color="#64748b"
+            color={colors.textMuted}
           />
         </Pressable>
       </View>
@@ -495,10 +501,10 @@ export default function Sidebar({ collapsed = false, onToggle, items }: SidebarP
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderRightWidth: 1,
-    borderRightColor: '#e2e8f0',
-    width: 280,
+    borderRightColor: colors.borderStrong,
+    width: SB.drawerWidth,
     height: '100%',
     ...Platform.select({
       web: { boxShadow: '2px 0 10px rgba(0,0,0,0.05)' },
@@ -512,7 +518,7 @@ const styles = StyleSheet.create({
     }),
   },
   collapsedContainer: {
-    width: 72,
+    width: SB.railWidth,
   },
   mobileContainer: {
     width: '100%',
@@ -544,7 +550,7 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: colors.divider,
   },
   logo: {
     flexDirection: 'row',
@@ -555,7 +561,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: '#3b82f6',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -563,12 +569,12 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1e293b',
+    color: colors.text,
   },
   toggleButton: {
     padding: 8,
     borderRadius: 6,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.page,
   },
   collapsedToggleButton: {
     alignSelf: 'center',
@@ -597,7 +603,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   activeMenuButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: colors.primary,
   },
   menuButtonContent: {
     flexDirection: 'row',
@@ -607,12 +613,12 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#475569',
+    color: colors.textSecondary,
     marginLeft: 12,
     flex: 1,
   },
   activeMenuText: {
-    color: '#ffffff',
+    color: colors.primaryOn,
     fontWeight: '600',
   },
   chevronIcon: {
@@ -632,21 +638,21 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   activeSubMenuItem: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: colors.primarySoft,
   },
   subMenuText: {
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textMuted,
     marginLeft: 12,
     fontWeight: '500',
   },
   activeSubMenuText: {
-    color: '#3b82f6',
+    color: colors.primary,
     fontWeight: '600',
   },
   footer: {
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderTopColor: colors.divider,
     padding: 16,
   },
   userProfile: {
@@ -660,12 +666,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#10b981',
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
-    color: '#ffffff',
+    color: colors.primaryOn,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -676,11 +682,11 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1e293b',
+    color: colors.text,
   },
   userRole: {
     fontSize: 12,
-    color: '#64748b',
+    color: colors.textMuted,
     marginTop: 2,
   },
 });
