@@ -1,24 +1,34 @@
-import { safeGetAllAsync, safeRunAsync } from "@/src/db/adapters";
+import { run, all } from './db-helpers';
 
-export type Project = { id: string; code?: string; name: string; status: string; scope: string };
+export type ProjectStatus = 'active' | 'paused' | 'done' | 'Pengembangan' | 'Konstruksi' | 'Selesai';
 
-export function getAllProjects(scope: string = "DEMO") {
-  // Existing schema does not include scope/status consistently; map minimal fields
-  return safeGetAllAsync(`SELECT id, code, name, COALESCE(status, 'active') AS status, '${scope}' AS scope FROM projects ORDER BY name;`);
+export interface ProjectInput {
+  id?: string;
+  name: string;
+  status?: ProjectStatus;
+  startDate?: string | null;
+  dueDate?: string | null;
 }
 
-export async function createProject(p: Omit<Project, "id" | "status" | "scope"> & { status?: string; scope?: string }) {
-  const id = `PRJ-${Math.random().toString(36).slice(2, 9)}`;
-  await safeRunAsync(`INSERT INTO projects (id, code, name, status, created_at) VALUES (?,?,?,?, datetime('now'));`, [
-    id,
-    p.code ?? null,
-    p.name,
-    p.status ?? "active",
-  ]);
-  return id;
+export async function insertProject(input: ProjectInput) {
+  const { id, name, status = 'active', startDate = null, dueDate = null } = input;
+  if (id) {
+    await run(
+      `INSERT INTO projects (id, name, status, start, due)
+       VALUES (?, ?, ?, ?, ?)`,
+      [id, name, status, startDate, dueDate]
+    );
+  } else {
+    await run(
+      `INSERT INTO projects (name, status, start, due)
+       VALUES (?, ?, ?, ?)`,
+      [name, status, startDate, dueDate]
+    );
+  }
 }
 
-export function deleteProject(id: string) {
-  // Hard delete aligns with existing patterns for projects (no soft-delete column observed)
-  return safeRunAsync(`DELETE FROM projects WHERE id = ?;`, [id]);
+export async function getAllProjects() {
+  return all<{ id:string; name:string; status:ProjectStatus; start?:string|null; due?:string|null }>(
+    `SELECT id, name, status, start, due FROM projects ORDER BY name ASC`
+  );
 }
