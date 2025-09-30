@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import dayjs from "dayjs";
 import { getAllWorkers, deleteWorker } from "@/src/db/queries/workers";
 import { exportCsvTable, exportExcelTable } from "@/src/services/export";
@@ -25,9 +33,15 @@ export default function WorkerManagement() {
     (async () => {
       try {
         setLoading(true);
-  const data = (await getAllWorkers()) as WorkerRow[];
+        const raw = await getAllWorkers();
         if (!ok) return;
-        setRows(data ?? []);
+        const data: WorkerRow[] = (raw ?? []).map((w: any) => ({
+          id: String(w.id),
+          name: w.name,
+          skill: w.role ?? undefined,
+          daily_wage: w.rate ?? undefined,
+        }));
+        setRows(data);
       } catch (e: any) {
         if (!ok) return;
         setErr(e?.message ?? "Failed to load workers");
@@ -43,7 +57,12 @@ export default function WorkerManagement() {
   const filtered = useMemo(() => {
     const list = (rows ?? []).slice();
     const ql = q.trim().toLowerCase();
-    const visible = list.filter((w) => !ql || w.name?.toLowerCase().includes(ql) || w.skill?.toLowerCase().includes(ql));
+    const visible = list.filter(
+      (w) =>
+        !ql ||
+        w.name?.toLowerCase().includes(ql) ||
+        w.skill?.toLowerCase().includes(ql)
+    );
     visible.sort((a, b) => {
       if (sortKey === "rate") {
         const A = a.daily_wage ?? 0,
@@ -73,16 +92,11 @@ export default function WorkerManagement() {
   }
   async function onExportXLSX() {
     const base = `workers-${dayjs().format("YYYY-MM-DD")}`;
-    await exportExcelTable(
-      filtered,
-      base,
-      "Workers",
-      [
-        { key: "name", header: "Name" },
-        { key: "skill", header: "Role" },
-        { key: "daily_wage", header: "Rate" },
-      ]
-    );
+    await exportExcelTable(filtered, base, "Workers", [
+      { key: "name", header: "Name" },
+      { key: "skill", header: "Role" },
+      { key: "daily_wage", header: "Rate" },
+    ]);
   }
 
   async function onDelete(id: string) {
@@ -126,13 +140,34 @@ export default function WorkerManagement() {
           style={S.input}
           inputMode="search"
         />
-        <Pressable onPress={() => setSortKey("name")} style={sortKey === "name" ? { ...S.btn, ...S.btnActive } : S.btn}>
-          <Text style={sortKey === "name" ? { ...S.btnTxt, ...S.btnTxtActive } : S.btnTxt}>Sort: Nama</Text>
+        <Pressable
+          onPress={() => setSortKey("name")}
+          style={sortKey === "name" ? { ...S.btn, ...S.btnActive } : S.btn}
+        >
+          <Text
+            style={
+              sortKey === "name" ? { ...S.btnTxt, ...S.btnTxtActive } : S.btnTxt
+            }
+          >
+            Sort: Nama
+          </Text>
         </Pressable>
-        <Pressable onPress={() => setSortKey("rate")} style={sortKey === "rate" ? { ...S.btn, ...S.btnActive } : S.btn}>
-          <Text style={sortKey === "rate" ? { ...S.btnTxt, ...S.btnTxtActive } : S.btnTxt}>Sort: Rate</Text>
+        <Pressable
+          onPress={() => setSortKey("rate")}
+          style={sortKey === "rate" ? { ...S.btn, ...S.btnActive } : S.btn}
+        >
+          <Text
+            style={
+              sortKey === "rate" ? { ...S.btnTxt, ...S.btnTxtActive } : S.btnTxt
+            }
+          >
+            Sort: Rate
+          </Text>
         </Pressable>
-        <Pressable onPress={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))} style={S.btn}>
+        <Pressable
+          onPress={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+          style={S.btn}
+        >
           <Text style={S.btnTxt}>{sortDir === "asc" ? "↑ Asc" : "↓ Desc"}</Text>
         </Pressable>
         <Pressable onPress={resetControls} style={S.btn}>
@@ -158,12 +193,21 @@ export default function WorkerManagement() {
             <Text style={S.meta}>Role: {item.skill ?? "-"}</Text>
             <Text style={S.meta}>Rate: {item.daily_wage ?? 0}</Text>
             <View style={{ flexDirection: "row", gap: 8 }}>
-              <Pressable onPress={() => { /* open edit form (future) */ }} style={S.smallBtn}>
+              <Pressable
+                onPress={() => {
+                  /* open edit form (future) */
+                }}
+                style={S.smallBtn}
+              >
                 <Text style={S.smallTxt}>Edit</Text>
               </Pressable>
               <Pressable
                 onPress={() => onDelete(item.id)}
-                style={{ ...S.smallBtn, backgroundColor: "#ffe8e8", borderColor: "#ffd0d0" }}
+                style={{
+                  ...S.smallBtn,
+                  backgroundColor: "#ffe8e8",
+                  borderColor: "#ffd0d0",
+                }}
               >
                 <Text style={{ ...S.smallTxt, color: "#b00020" }}>Hapus</Text>
               </Pressable>
@@ -182,16 +226,57 @@ export default function WorkerManagement() {
 
 const S = {
   root: { flex: 1 as const, minWidth: 0 as const, minHeight: 0 as const },
-  center: { flex: 1 as const, alignItems: "center" as const, justifyContent: "center" as const, padding: 16 },
-  toolbar: { flexDirection: "row" as const, flexWrap: "wrap" as const, alignItems: "center" as const, gap: 8, paddingHorizontal: 12, paddingTop: 12 },
-  input: { flexGrow: 1 as const, minWidth: 220, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: "#e3e3e7", borderRadius: 8 },
-  btn: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: "#e3e3e7" },
+  center: {
+    flex: 1 as const,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    padding: 16,
+  },
+  toolbar: {
+    flexDirection: "row" as const,
+    flexWrap: "wrap" as const,
+    alignItems: "center" as const,
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingTop: 12,
+  },
+  input: {
+    flexGrow: 1 as const,
+    minWidth: 220,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#e3e3e7",
+    borderRadius: 8,
+  },
+  btn: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e3e3e7",
+  },
   btnActive: { backgroundColor: "#e8f0ff", borderColor: "#b6ccff" },
   btnTxt: { opacity: 0.85 },
   btnTxtActive: { opacity: 1, fontWeight: "600" as const },
-  row: { padding: 12, borderRadius: 12, backgroundColor: "white", borderWidth: 1, borderColor: "#eee", marginBottom: 10, gap: 6 },
+  row: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#eee",
+    marginBottom: 10,
+    gap: 6,
+  },
   title: { fontSize: 16, fontWeight: "600" as const },
   meta: { fontSize: 14 },
-  smallBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: "#e3e3e7", backgroundColor: "#f7f7fa" },
+  smallBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e3e3e7",
+    backgroundColor: "#f7f7fa",
+  },
   smallTxt: { fontSize: 13, opacity: 0.9 },
 } as const;
