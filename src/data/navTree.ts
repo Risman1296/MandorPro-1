@@ -3,106 +3,115 @@ export type SubTab = { id: string; label: string };
 export type Tab = { id: string; label: string; subTabs?: SubTab[] };
 
 // New explicit types per spec
-export type NavTab = { id: string; label: string; subTabs?: { id: string; label: string }[] };
-export type NavNode = { id: string; label: string; icon: string; path: string; tabs?: NavTab[] };
+export type NavTab = { id: string; label: string; route: string; subTabs?: { id: string; label: string }[] };
+export type NavNode = { id: string; label: string; icon: string; route: string; tabs?: NavTab[] };
 
 export const NAV_TREE: NavNode[] = [
-  // UI baru
   {
     id: 'dashboard',
     label: 'Dashboard',
-    icon: 'layout-dashboard',
-    path: '/dashboard',
-    tabs: [
-      { id: 'overview', label: 'Ringkasan' },
-      {
-        id: 'reports',
-        label: 'Laporan',
-        subTabs: [
-          { id: 'daily', label: 'Harian' },
-          { id: 'monthly', label: 'Bulanan' },
-        ],
-      },
-    ],
+    icon: 'grid-outline',
+    route: '/dashboard',
+    tabs: [],
   },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: 'settings',
-    path: '/settings',
-    tabs: [
-      { id: 'profile', label: 'Profil' },
-      { id: 'billing', label: 'Billing' },
-    ],
-  },
-
-  // Section lain yang ada di repo
   {
     id: 'project',
-    label: 'Proyek',
-    icon: 'folder-kanban',
-    path: '/project',
-    tabs: [{ id: 'management', label: 'Manajemen' }],
+    label: 'Projects',
+    icon: 'layers-outline',
+    route: '/project/management',
+    tabs: [
+      { id: 'management', label: 'Manajemen', route: '/project/management' },
+      { id: 'tasks', label: 'Tasks', route: '/project/tasks' },
+      { id: 'timeline', label: 'Timeline', route: '/project/timeline' },
+    ],
   },
   {
     id: 'worker',
-    label: 'Pekerja',
-    icon: 'users',
-    path: '/worker',
-    tabs: [{ id: 'management', label: 'Manajemen' }],
+    label: 'Workers',
+    icon: 'people-outline',
+    route: '/worker/management',
+    tabs: [
+      { id: 'management', label: 'Manajemen', route: '/worker/management' },
+    ],
   },
   {
     id: 'material',
-    label: 'Material',
-    icon: 'package',
-    path: '/material',
+    label: 'Materials',
+    icon: 'cube-outline',
+    route: '/material/management',
     tabs: [
-      { id: 'stock', label: 'Stok' },
-      { id: 'usage', label: 'Pemakaian' },
+      { id: 'stock', label: 'Stok', route: '/material/stock' },
+      { id: 'usage', label: 'Pemakaian', route: '/material/usage' },
+      { id: 'management', label: 'Manajemen', route: '/material/management' },
     ],
   },
   {
     id: 'payroll',
-    label: 'Gaji',
-    icon: 'wallet',
-    path: '/payroll',
-    tabs: [{ id: 'management', label: 'Manajemen' }],
+    label: 'Payroll',
+    icon: 'wallet-outline',
+    route: '/payroll',
+    tabs: [
+      { id: 'management', label: 'Manajemen', route: '/payroll' },
+    ],
   },
   {
     id: 'gaji',
     label: 'Gaji (Legacy)',
-    icon: 'calendar-number',
-    path: '/gaji',
-    tabs: [{ id: 'weekly', label: 'Mingguan' }],
+    icon: 'calendar-outline',
+    route: '/gaji/weekly',
+    tabs: [
+      { id: 'weekly', label: 'Mingguan', route: '/gaji/weekly' },
+    ],
   },
-  { id: 'absensi', label: 'Absensi', icon: 'calendar-check', path: '/absensi' },
+  {
+    id: 'absensi',
+    label: 'Absensi',
+    icon: 'calendar-outline',
+    route: '/absensi',
+    tabs: [
+      { id: 'harian', label: 'Harian', route: '/absensi' },
+      { id: 'rekap', label: 'Rekap', route: '/absensi/rekap' },
+    ],
+  },
   {
     id: 'harian',
     label: 'Harian',
-    icon: 'notebook',
-    path: '/harian',
-    tabs: [{ id: 'diary', label: 'Diary' }],
+    icon: 'book-outline',
+    route: '/harian/diary',
+    tabs: [
+      { id: 'diary', label: 'Diary', route: '/harian/diary' },
+      { id: 'foto', label: 'Foto', route: '/harian/foto' },
+    ],
   },
   {
     id: 'report',
     label: 'Report',
-    icon: 'file-text',
-    path: '/report',
-    tabs: [{ id: 'daily', label: 'Harian' }],
+    icon: 'stats-chart-outline',
+    route: '/report',
+    tabs: [
+      { id: 'daily', label: 'Harian', route: '/report/daily' },
+      { id: 'monthly', label: 'Bulanan', route: '/report/monthly' },
+    ],
   },
   {
     id: 'laporan',
     label: 'Laporan',
-    icon: 'file-chart',
-    path: '/laporan',
-    tabs: [{ id: 'export', label: 'Export' }],
+    icon: 'document-outline',
+    route: '/laporan',
+    tabs: [
+      { id: 'export', label: 'Export', route: '/laporan/export' },
+      { id: 'summary', label: 'Ringkasan', route: '/laporan/summary' },
+    ],
   },
   {
     id: 'admin',
     label: 'Admin',
-    icon: 'shield',
-    path: '/admin',
-    tabs: [{ id: 'data', label: 'Data' }],
+    icon: 'settings-outline',
+    route: '/admin',
+    tabs: [
+      { id: 'data', label: 'Data', route: '/admin/data' },
+      { id: 'database', label: 'Database', route: '/admin/database' },
+    ],
   },
 ];
 
