@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "946424976533",
+    "project_id": "mandorpro-f058d",
+    "storage_bucket": "mandorpro-f058d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946424976533:android:eacbfc024f63349d5fb79c",
+        "android_client_info": {
+          "package_name": "com.risman.mandorpro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBRzE8ZDbGEvKGQcXj1OANsb4GVq1kfQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,6 @@
 {
   "expo": {
+    "runtimeVersion": { "policy": "nativeVersion" },
     "name": "MandorPro",
     "slug": "MandorPro",
     "scheme": "mandorpro",

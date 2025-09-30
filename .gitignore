@@ -40,7 +40,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
-google-services.json
 google-play-service-account.json
 
 # Ignore sqlite db files (local/demo database files)
