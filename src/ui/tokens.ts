@@ -1,3 +1,44 @@
+// ---- Color tokens (for Sidebar and UI) ----
+export const colors = {
+  // Base
+  background: '#0B0F14',
+  surface:    '#111827',
+  border:     '#1F2937',
+  text:       '#E5E7EB',
+  muted:      '#9CA3AF',
+
+  // Sidebar
+  sidebarBg:      '#0F172A',
+  sidebarHover:   '#1E293B',
+  sidebarActive:  '#334155',
+  sidebarActiveText: '#FFFFFF',
+
+  // Semantic
+  primary:  '#3B82F6',
+  success:  '#10B981',
+  warning:  '#F59E0B',
+  danger:   '#EF4444',
+
+  // --- Back-compat aliases used by Sidebar.tsx ---
+  // Ikon & teks redup
+  iconMuted:     '#9CA3AF', // alias muted
+  textMuted:     '#9CA3AF', // alias muted
+  textSecondary: '#CBD5E1',
+  // Border / divider variasi
+  borderStrong:  '#374151',
+  divider:       '#1F2937', // alias border
+  // Lainnya
+  page:          '#0B0F14', // alias background
+  primaryOn:     '#FFFFFF', // teks di atas primary
+  primarySoft:   '#1E3A8A', // varian lembut primary (darken)
+  accent:        '#3B82F6', // sementara samakan ke primary
+} as const;
+
+export type ColorName = keyof typeof colors;
+
+// (Optional) keep default export for compatibility
+const tokens = { colors };
+export default tokens;
 import { Dimensions } from 'react-native';
 
 export const spacing = Object.freeze({
