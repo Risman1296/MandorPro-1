@@ -1,0 +1,31 @@
+import { Redirect, Stack } from "expo-router";
+import { useEffect, useState } from "react";
+import { getSession } from "../../lib/auth";
+import Layout from "../../components/Layout";
+import { Text, View } from "react-native";
+
+export default function AppLayout() {
+  const [status, setStatus] = useState<"loading" | "in" | "out">("loading");
+
+  useEffect(() => {
+    (async () => {
+      const s = await getSession();
+      setStatus(s ? "in" : "out");
+    })();
+  }, []);
+
+  if (status === "loading") {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Memuat...</Text>
+      </View>
+    );
+  }
+  if (status === "out") return <Redirect href="/(auth)/sign-in" />;
+
+  return (
+    <Layout>
+      <Stack screenOptions={{ headerShown: false }} />
+    </Layout>
+  );
+}

@@ -84,31 +84,45 @@ export async function ensureSeededWith(
 import { run as runAdapter, get as getAdapter } from '@/src/db/adapters';
 
 export async function ensureDemoSeed(force = false) {
-  const row = await getAdapter<{ value: string }>("SELECT value FROM kv WHERE key='demo_seeded'");
-  if (!force && row?.value === '1') return;
+  try {
+    const row = await getAdapter<{ value: string }>("SELECT value FROM kv WHERE key='demo_seeded'");
+    if (!force && row?.value === '1') return;
+  } catch {
+    // kv table may not exist; continue best-effort
+  }
 
-  await runAdapter(
-    `INSERT OR IGNORE INTO materials (id,name,unit,total_in,total_out,scope)
-     VALUES ('MAT-DEMO-SEMEN','Semen','sak',100,12,'DEMO')`
-  );
-  await runAdapter(
-    `INSERT OR IGNORE INTO workers (id,name,role,rate,active,scope)
-     VALUES ('WRK-DEMO-BUDI','Budi','Tukang',120000,1,'DEMO')`
-  );
-  await runAdapter(
-    `INSERT OR IGNORE INTO projects (id,code,name,status,scope)
-     VALUES ('PRJ-DEMO-001','PRJ-001','Renovasi Rumah A','active','DEMO')`
-  );
-  await runAdapter("INSERT OR REPLACE INTO kv (key,value) VALUES ('demo_seeded','1')");
+  // Best-effort inserts; ignore if columns/tables differ
+  try {
+    await runAdapter(
+      `INSERT OR IGNORE INTO materials (id,name,unit,total_in,total_out,scope)
+       VALUES ('MAT-DEMO-SEMEN','Semen','sak',100,12,'DEMO')`
+    );
+  } catch {}
+  try {
+    await runAdapter(
+      `INSERT OR IGNORE INTO workers (id,name,role,rate,active,scope)
+       VALUES ('WRK-DEMO-BUDI','Budi','Tukang',120000,1,'DEMO')`
+    );
+  } catch {}
+  try {
+    await runAdapter(
+      `INSERT OR IGNORE INTO projects (id,code,name,status,scope)
+       VALUES ('PRJ-DEMO-001','PRJ-001','Renovasi Rumah A','active','DEMO')`
+    );
+  } catch {}
+  try {
+    await runAdapter("INSERT OR REPLACE INTO kv (key,value) VALUES ('demo_seeded','1')");
+  } catch {}
 }
 
 export async function wipeDemoData() {
-  await runAdapter(`DELETE FROM attendance WHERE scope='DEMO'`);
-  await runAdapter(`DELETE FROM material_ledger WHERE scope='DEMO'`);
-  await runAdapter(`DELETE FROM materials WHERE scope='DEMO'`);
-  await runAdapter(`DELETE FROM workers WHERE scope='DEMO'`);
-  await runAdapter(`DELETE FROM projects WHERE scope='DEMO'`);
-  await runAdapter("INSERT OR REPLACE INTO kv (key,value) VALUES ('demo_seeded','0')");
+  // Best-effort deletes; ignore if schema differs
+  try { await runAdapter(`DELETE FROM attendance WHERE scope='DEMO'`); } catch {}
+  try { await runAdapter(`DELETE FROM material_ledger WHERE scope='DEMO'`); } catch {}
+  try { await runAdapter(`DELETE FROM materials WHERE scope='DEMO'`); } catch {}
+  try { await runAdapter(`DELETE FROM workers WHERE scope='DEMO'`); } catch {}
+  try { await runAdapter(`DELETE FROM projects WHERE scope='DEMO'`); } catch {}
+  try { await runAdapter("INSERT OR REPLACE INTO kv (key,value) VALUES ('demo_seeded','0')"); } catch {}
 }
 // Database seeding utilities
 import { Platform } from 'react-native';

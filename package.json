@@ -4,8 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "web:clear": "expo start --web --clear",
     "web:export": "expo export --platform web -o dist",
@@ -24,7 +24,9 @@
     "eas:submit:android": "eas submit -p android --profile production",
     "android:prebuild": "expo prebuild -p android",
     "android:bundle": "cd android && .\\gradlew bundleRelease",
-    "android:apk": "cd android && .\\gradlew assembleRelease"
+    "android:apk": "cd android && .\\gradlew assembleRelease",
+    "android:auto": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\run-emulator-and-build.ps1",
+    "android:gradle:auto": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\build-install-launch.ps1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -50,6 +52,7 @@
     "expo-auth-session": "^7.0.8",
     "expo-camera": "^17.0.8",
     "expo-constants": "~18.0.9",
+    "expo-dev-client": "~6.0.12",
     "expo-file-system": "~19.0.15",
     "expo-font": "~14.0.8",
     "expo-linking": "~8.0.8",
@@ -58,14 +61,14 @@
     "expo-print": "^15.0.7",
     "expo-router": "~6.0.8",
     "expo-sharing": "^14.0.7",
-    "expo-sqlite": "^16.0.8",
+    "expo-sqlite": "~16.0.8",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-screens": "^4.16.0",
-    "react-native-svg": "^15.13.0",
+    "react-native-svg": "15.12.1",
     "react-native-web": "^0.21.1",
     "uuid": "^13.0.0",
     "xlsx": "^0.18.5",

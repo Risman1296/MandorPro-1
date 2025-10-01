@@ -1,4 +1,4 @@
-let session: { userId: string } | null = null;
+let session: { userId: string } | null = { userId: "dev" };
 
 export async function getSession() {
   // ganti dengan cek token/secure store/api milikmu

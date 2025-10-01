@@ -1,0 +1,223 @@
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
+import { useRouter } from "expo-router";
+
+type KPI = { label: string; value: number; route?: string };
+
+export default function DashboardScreen() {
+  const router = useRouter();
+  const [kpis, setKpis] = useState<KPI[]>([]);
+  const [recentTasks, setRecentTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dbReady, setDbReady] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const mod = (await import("@/src/db/adapters")) as any;
+        const get: ((sql: string, params?: any[]) => Promise<any>) | undefined =
+          mod?.get;
+        const all:
+          | ((sql: string, params?: any[]) => Promise<any[]>)
+          | undefined = mod?.all;
+
+        if (!get) {
+          setDbReady(false);
+          setLoading(false);
+          return;
+        }
+
+        const count = async (sql: string, params: any[] = []) => {
+          try {
+            const r = (await get(sql, params)) as { c?: number } | undefined;
+            return r?.c ?? 0;
+          } catch {
+            return 0;
+          }
+        };
+
+        const cProjects = await count(`SELECT COUNT(*) c FROM projects`);
+        const cWorkers = await count(`SELECT COUNT(*) c FROM workers`);
+        const cMaterials = await count(`SELECT COUNT(*) c FROM materials`);
+        const cOpenTask = await count(
+          `SELECT COUNT(*) c FROM tasks WHERE status IS NULL OR status IN ('TODO','DOING')`
+        );
+        const cAttToday = await count(
+          `SELECT COUNT(*) c FROM attendance WHERE date(COALESCE(date,created_at,ts)) = date('now')`
+        );
+        const cProgToday = await count(
+          `SELECT COUNT(*) c FROM unit_progress WHERE date(COALESCE(date,created_at,ts)) = date('now')`
+        );
+        const cMatToday = await count(
+          `SELECT COUNT(*) c FROM material_ledger WHERE date(COALESCE(date,created_at,date)) = date('now')`
+        );
+
+        setKpis([
+          { label: "Projects", value: cProjects, route: "/project/management" },
+          { label: "Workers", value: cWorkers, route: "/worker/management" },
+          {
+            label: "Materials",
+            value: cMaterials,
+            route: "/material/management",
+          },
+          { label: "Tasks (Open)", value: cOpenTask, route: "/project/tasks" },
+          { label: "Absensi (Hari ini)", value: cAttToday, route: "/absensi" },
+          {
+            label: "Progres (Hari ini)",
+            value: cProgToday,
+            route: "/progres/form",
+          },
+          {
+            label: "Material (Hari ini)",
+            value: cMatToday,
+            route: "/material/usage",
+          },
+        ]);
+
+        if (all) {
+          try {
+            const rows = await all(
+              `SELECT id, title, status, project_id
+               FROM tasks
+               ORDER BY COALESCE(updated_at, created_at, id) DESC
+               LIMIT 8`
+            );
+            setRecentTasks(rows ?? []);
+          } catch {
+            setRecentTasks([]);
+          }
+        } else {
+          setRecentTasks([]);
+        }
+
+        setDbReady(true);
+      } catch {
+        setDbReady(false);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const QuickAction = ({ label, to }: { label: string; to: string }) => (
+    <Pressable
+      onPress={() => router.push(to as any)}
+      style={{
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderRadius: 12,
+        marginRight: 8,
+        marginBottom: 8,
+      }}
+      accessibilityLabel={label}
+    >
+      <Text>{label}</Text>
+    </Pressable>
+  );
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 16,
+        }}
+      >
+        <ActivityIndicator />
+        <Text style={{ marginTop: 12 }}>Memuat dashboard…</Text>
+      </View>
+    );
+  }
+
+  if (!dbReady) {
+    return (
+      <View style={{ flex: 1, padding: 16 }}>
+        <Text style={{ fontSize: 18, fontWeight: "700" }}>Dashboard</Text>
+        <Text style={{ marginTop: 8, opacity: 0.7 }}>
+          Adapter DB tidak tersedia di lingkungan ini. Coba jalankan “Seed Demo
+          Data” di Admin → Database, atau jalankan di perangkat/emulator.
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, padding: 16 }}>
+      <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 12 }}>
+        Dashboard
+      </Text>
+
+      {/* Quick Actions */}
+      <View
+        style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 12 }}
+      >
+        <QuickAction label="Projects" to="/project/management" />
+        <QuickAction label="Workers" to="/worker/management" />
+        <QuickAction label="Materials" to="/material/management" />
+        <QuickAction label="Tasks" to="/project/tasks" />
+        <QuickAction label="Absensi" to="/absensi" />
+        <QuickAction label="Progres" to="/progres/form" />
+        <QuickAction label="Reports" to="/report/daily" />
+      </View>
+
+      {/* KPI Cards */}
+      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        {kpis.map((k) => (
+          <Pressable
+            key={k.label}
+            onPress={() => k.route && router.push(k.route as any)}
+            style={{
+              width: "48%",
+              borderWidth: 1,
+              borderRadius: 12,
+              padding: 12,
+              marginBottom: 10,
+              marginRight: "4%",
+            }}
+          >
+            <Text style={{ opacity: 0.7 }}>{k.label}</Text>
+            <Text style={{ fontSize: 24, fontWeight: "800", marginTop: 6 }}>
+              {k.value}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      {/* Recent Tasks */}
+      <View style={{ marginTop: 16 }}>
+        <Text style={{ fontSize: 16, fontWeight: "700", marginBottom: 8 }}>
+          Recent Tasks
+        </Text>
+        {recentTasks.length === 0 ? (
+          <Text style={{ opacity: 0.7 }}>
+            Belum ada task atau tabel tasks tidak tersedia.
+          </Text>
+        ) : (
+          <FlatList
+            data={recentTasks}
+            keyExtractor={(it) => String(it.id)}
+            renderItem={({ item }) => (
+              <View style={{ paddingVertical: 8, borderBottomWidth: 1 }}>
+                <Text>{item.title ?? "(untitled)"}</Text>
+                <Text style={{ opacity: 0.7, fontSize: 12 }}>
+                  Status: {item.status ?? "—"} | Project:{" "}
+                  {item.project_id ?? "—"}
+                </Text>
+              </View>
+            )}
+          />
+        )}
+      </View>
+    </View>
+  );
+}

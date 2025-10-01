@@ -1,39 +1,102 @@
+import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
-import { useEffect } from 'react';
-import Layout from '@/components/Layout';
-import { setupNotifications } from '@/src/services/push';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { ConstructionTheme } from '@/src/constants/Theme';
+import { StyleSheet, Platform } from 'react-native';
 import { initDb } from '@/src/db/boot';
-import { ensureDemoSeed } from '@/src/db/seed';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   useEffect(() => {
-    // fire-and-forget setup; errors are non-fatal
-    setupNotifications().catch(() => {});
-    initDb()
-      .then(() => ensureDemoSeed(false))
-      .catch(() => {});
+    initDb().catch(console.error);
   }, []);
+
   return (
     <SafeAreaProvider>
-      <Layout>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="worker/management" />
-          <Stack.Screen name="project/management" />
-          <Stack.Screen name="progres/form" />
-          <Stack.Screen name="material/usage" />
-          <Stack.Screen name="material/stock" />
-          <Stack.Screen name="material/management" />
-          <Stack.Screen name="payroll/management" />
-          <Stack.Screen name="gaji/weekly" />
-          <Stack.Screen name="absensi/index" />
-          <Stack.Screen name="harian/diary" />
-          <Stack.Screen name="report/daily" />
-          <Stack.Screen name="laporan/export" />
-          <Stack.Screen name="admin/data" />
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" backgroundColor={ConstructionTheme.colors.primary} />
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: ConstructionTheme.colors.primary,
+            },
+            headerTintColor: '#FFFFFF',
+            headerTitleStyle: {
+              fontWeight: '600',
+              fontSize: 18,
+            },
+            headerShadowVisible: true,
+            contentStyle: {
+              backgroundColor: ConstructionTheme.colors.background,
+            },
+            animation: Platform.OS === 'ios' ? 'slide_from_right' : 'fade',
+          }}
+        >
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
+          <Stack.Screen 
+            name="index" 
+            options={{ 
+              title: 'MandorPro - Dashboard',
+              headerStyle: {
+                backgroundColor: ConstructionTheme.colors.primary,
+              },
+            }} 
+          />
+          <Stack.Screen 
+            name="dashboard/index" 
+            options={{ 
+              title: 'Dashboard Mandor',
+              headerStyle: {
+                backgroundColor: ConstructionTheme.colors.primary,
+              },
+            }} 
+          />
+          <Stack.Screen 
+            name="project/index" 
+            options={{ 
+              title: 'Manajemen Proyek',
+              headerStyle: {
+                backgroundColor: ConstructionTheme.colors.primary,
+              },
+            }} 
+          />
+          <Stack.Screen 
+            name="worker/index" 
+            options={{ 
+              title: 'Manajemen Pekerja',
+              headerStyle: {
+                backgroundColor: ConstructionTheme.colors.primary,
+              },
+            }} 
+          />
+          <Stack.Screen 
+            name="material/index" 
+            options={{ 
+              title: 'Manajemen Material',
+              headerStyle: {
+                backgroundColor: ConstructionTheme.colors.primary,
+              },
+            }} 
+          />
+          <Stack.Screen 
+            name="gaji/index" 
+            options={{ 
+              title: 'Sistem Penggajian',
+              headerStyle: {
+                backgroundColor: ConstructionTheme.colors.primary,
+              },
+            }} 
+          />
         </Stack>
-      </Layout>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: ConstructionTheme.colors.background,
+  },
+});

@@ -2,6 +2,13 @@ const { getDefaultConfig } = require('@expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
+
+// Enable .wasm support for expo-sqlite web
+config.resolver.assetExts = config.resolver.assetExts || [];
+if (!config.resolver.assetExts.includes('wasm')) {
+  config.resolver.assetExts.push('wasm');
+}
+
 // Disable source maps for now to fix the <anonymous> file issue
 config.transformer.minifierConfig = {
   keep_fnames: true,

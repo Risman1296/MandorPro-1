@@ -18,7 +18,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.risman.mandorpro",
+      "package": "com.mandorpro",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -28,7 +28,11 @@
       "googleServicesFile": "./google-services.json"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "wasm": {
+        "wa-sqlite": "./public/wa-sqlite.wasm"
+      },
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",

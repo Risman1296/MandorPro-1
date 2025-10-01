@@ -1,0 +1,19 @@
+import { Slot } from "expo-router";
+import { useEffect } from "react";
+import { initDb } from "@/src/db/boot";
+import { seedDatabaseSync } from "@/src/db/seed";
+
+export default function RootLayout() {
+  useEffect(() => {
+    (async () => {
+      try {
+        // Initialize full database schema and minimal seed on startup
+        await initDb();
+        await seedDatabaseSync();
+      } catch (e) {
+        console.error("DB init failed", e);
+      }
+    })();
+  }, []);
+  return <Slot />;
+}

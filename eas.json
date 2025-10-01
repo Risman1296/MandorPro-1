@@ -4,18 +4,31 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "base": {
+      "node": "20.19.4"
+    },
     "preview": {
+      "extends": "base",
       "distribution": "internal",
       "channel": "preview",
-      "autoIncrement": true
+      "autoIncrement": false
     },
     "internal": {
+      "extends": "base",
       "distribution": "internal",
       "channel": "internal",
-      "autoIncrement": true
+      "autoIncrement": false
     },
     "production": {
+      "extends": "base",
+      "channel": "production",
       "autoIncrement": true
+    },
+    "development": {
+      "extends": "base",
+      "developmentClient": false,
+      "android": { "buildType": "apk" },
+      "ios": { "simulator": true }
     }
   },
   "submit": {
